@@ -35,29 +35,27 @@ PULL_REQUEST_REF=$(jq --raw-output .pull_request.head.ref "$GITHUB_EVENT_PATH")
 IS_PULL_REQUEST_MERGED=$(jq --raw-output .pull_request.merged "$GITHUB_EVENT_PATH")
 
 label_when_pull_request_closed() {
-  PULL_REQUEST_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-  PULL_REQUEST_OWNER=$(jq --raw-output .pull_request.head.repo.owner.login "$GITHUB_EVENT_PATH")
-  PULL_REQUEST_REPO=$(jq --raw-output .pull_request.head.repo.name "$GITHUB_EVENT_PATH")
-
   if [[ "$IGNORE_BASE_BRANCH" == "true" ]]; then
     echo "Check: if current closed PR branch is a base-branch of another PR."
     PULLS_AS_BASE_BRANCH=$(
   		curl -XGET -fsSL \
   			-H "${AUTH_HEADER}" \
   			-H "${API_HEADER}" \
-  			"${URI}/repos/${PULL_REQUEST_OWNER}/${PULL_REQUEST_REPO}/pulls?state=open&base=${PULL_REQUEST_REF}"
+  			"${URI}/repos/${GITHUB_REPOSITORY}/pulls?state=open&base=${PULL_REQUEST_REF}"
   	)
   	IS_BASE_BRANCH=$(echo "$PULLS_AS_BASE_BRANCH" | jq 'has(0)')
 
     # Do not add label if It is a base branch of another pull request
     if [[ "$IS_BASE_BRANCH" == "true" ]]; then
   		NUMBER=$(echo "$PULLS_AS_BASE_BRANCH" | jq '.[0].number')
-  		echo "Ignoring - ${PULL_REQUEST_REF} is the base branch of PR #${NUMBER} for ${PULL_REQUEST_OWNER}/${PULL_REQUEST_REPO}."
+  		echo "Ignoring - ${PULL_REQUEST_REF} is the base branch of PR #${NUMBER} for ${GITHUB_REPOSITORY}."
   		exit 0
   	fi
   fi
 
   echo "Labeling pull request"
+  PULL_REQUEST_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+
   curl -sSL \
     -H "${AUTH_HEADER}" \
     -H "${API_HEADER}" \
