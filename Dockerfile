@@ -9,6 +9,5 @@ LABEL maintainer="Manish Rathi <manishrathi19902013@gmail.com>"
 
 RUN apk add --no-cache bash curl jq
 
-COPY entrypoint.sh /usr/bin/entrypoint.sh
-
-ENTRYPOINT ["entrypoint.sh"]
+ADD entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
