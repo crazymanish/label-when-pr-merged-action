@@ -72,7 +72,7 @@ if [[ "$PULL_REQUEST_REF" =~ $IGNORE_BRANCH_REGEX ]]; then
   exit 0
 fi
 
-if [[ "$ACTION" == "closed" ]] && ([[ "$IS_PULL_REQUEST_MERGED" == "true" ]] || [[ "$IGNORE_CLOSED_PULL_REQUEST" == "true" ]]); then
+if [[ "$ACTION" == "closed" ]] && ([[ "$IS_PULL_REQUEST_MERGED" == "true" ]] || [[ "$IGNORE_CLOSED_PULL_REQUEST" == "false" ]]); then
   label_when_pull_request_closed
 else
   echo "Ignoring pull-request event - action: $ACTION, merged: $IS_PULL_REQUEST_MERGED"
